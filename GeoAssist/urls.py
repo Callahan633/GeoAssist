@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 
 from api.views import RegistrationAPIView, LoginAPIView, PlaceCreatingAPIView, SetPlaceFavouriteAPIView, \
-    GetFavouritePlacesAPIView
+    GetFavouritePlacesAPIView, PlaceHistoryAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,5 +26,6 @@ urlpatterns = [
     re_path(r'^api/auth', LoginAPIView.as_view(), name='user_auth'),
     re_path(r'^api/add_place', PlaceCreatingAPIView.as_view(), name='place_creating'),
     re_path(r'^api/set_favourite', SetPlaceFavouriteAPIView.as_view(), name='add_to_favourites'),
-    re_path(r'^api/get_favourites', GetFavouritePlacesAPIView.as_view({'get': 'retrieve'}), name='user_favourites')
+    re_path(r'^api/get_favourites', GetFavouritePlacesAPIView.as_view({'get': 'retrieve'}), name='user_favourites'),
+    re_path(r'^api/get_history', PlaceHistoryAPIView.as_view({'get': 'retrieve'}), name='user_favourites')
 ]

@@ -21,20 +21,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
-class PlaceSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Place
-        fields = ('name', 'category', 'is_favourite')
-
-    def create(self, validated_data):
-        user = self.context['request'].user
-        return Place.objects.create_place_for_history(user, **validated_data)
-
-    def update(self, instance, validated_data):
-        return Place.objects.set_place_to_favourite(instance, **validated_data)
-
-
 class DateSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -43,8 +29,24 @@ class DateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        place = Place.objects.get(user=user)
+        place = Place.objects.get(user=user, name=self.context['request'].data['name'])
         return VisitDate.objects.create_date_for_history(place, **validated_data)
+
+
+class PlaceSerializer(serializers.ModelSerializer):
+
+    dates = DateSerializer(source='visitdate_set', many=True, read_only=True)
+
+    class Meta:
+        model = Place
+        fields = ('name', 'category', 'is_favourite', 'dates')
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        return Place.objects.create_place_for_history(user, **validated_data)
+
+    def update(self, instance, validated_data):
+        return Place.objects.set_place_to_favourite(instance, **validated_data)
 
 
 class LoginSerializer(serializers.Serializer):

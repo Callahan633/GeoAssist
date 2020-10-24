@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.viewsets import ViewSet
 
 from .serializers import LoginSerializer, RegistrationSerializer, PlaceSerializer, DateSerializer
-from .models import Place
+from .models import Place, VisitDate
 
 
 class RegistrationAPIView(APIView):
@@ -62,6 +62,24 @@ class PlaceCreatingAPIView(APIView):
         )
 
 
+class PlaceHistoryAPIView(ViewSet):
+    queryset = VisitDate.objects.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = PlaceSerializer
+
+    def retrieve(self, request):
+        places_list = Place.objects.filter(user_id=request.user.uuid)
+        new_data = []
+        for item in places_list:
+            serializer = self.serializer_class(instance=item)
+            print(serializer.data)
+            new_data.append(serializer.data)
+        return Response(
+            new_data,
+            status=status.HTTP_200_OK
+        )
+
+
 class SetPlaceFavouriteAPIView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PlaceSerializer
@@ -106,8 +124,6 @@ class GetFavouritePlacesAPIView(ViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         favourites_list = self.queryset.filter(user_id=request.user, is_favourite=True)
-        print(request.user.uuid)
-        print(favourites_list)
         serializer = self.serializer_class(favourites_list, many=True)
         return Response(
             serializer.data,
