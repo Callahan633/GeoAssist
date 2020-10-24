@@ -100,32 +100,34 @@ class PlaceManager(models.Manager):
     def create_place_for_history(self, user: User, **extra_fields):
         return self._create_place(user, **extra_fields)
 
-    def set_place_to_favourite(self, place):
-        place.is_favourite = True
+    def set_place_to_favourite(self, is_favourite):
+        place = self.model(
+            is_favourite=is_favourite,
+        )
+
         place.save(using=self._db)
+        return place
 
 
 class DateManager(models.Manager):
 
-    def _create_date(self, place, **extra_fields):
+    def _create_date(self, place):
         visit_date = self.model(
             place=place,
-            **extra_fields,
         )
         visit_date.save(using=self._db)
 
         return visit_date
 
-    def create_date_for_history(self, place, **extra_fields):
-        return self._create_date(place, **extra_fields)
+    def create_date_for_history(self, place):
+        return self._create_date(place)
 
 
 class Place(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255, blank=False, default='Sample Place')
+    name = models.CharField(max_length=255, blank=False, default='Sample Place', unique=True)
     is_favourite = models.BooleanField(default=False)
     category = models.CharField(max_length=255, blank=True)
-    date_visited = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     objects = PlaceManager()

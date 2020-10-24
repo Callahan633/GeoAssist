@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate
-from rest_framework import serializers
+from rest_framework import serializers, viewsets
 
-from .models import User, Place
+from .models import User, Place, VisitDate
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -25,17 +25,26 @@ class PlaceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Place
-        fields = ('name', 'category')
+        fields = ('name', 'category', 'is_favourite')
 
     def create(self, validated_data):
         user = self.context['request'].user
-        print(validated_data)
         return Place.objects.create_place_for_history(user, **validated_data)
 
-    def set_favourite(self, validated_data):
+    def update(self, instance, validated_data):
+        return Place.objects.set_place_to_favourite(instance, **validated_data)
+
+
+class DateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = VisitDate
+        fields = ('date_visited',)
+
+    def create(self, validated_data):
         user = self.context['request'].user
         place = Place.objects.get(user=user)
-        return Place.objects.set_place_to_favourite(place, **validated_data)
+        return VisitDate.objects.create_date_for_history(place, **validated_data)
 
 
 class LoginSerializer(serializers.Serializer):
