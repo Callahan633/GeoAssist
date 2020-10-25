@@ -39,3 +39,6 @@ Python 3.8, PostgresQL 12
  `python3 manage.py runserver` - on `localhost:8000'
  `python3 manage.py runserver 0.0.0.0:8000` - on static IP-address
     
+
+# Документация по API
+https://docs.google.com/document/d/1VjMuZuqGQGZ-o0nZlF8MIgAL-iPTFDFoCTG9nNxsA1s/edit?usp=sharing
